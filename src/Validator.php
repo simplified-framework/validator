@@ -17,7 +17,7 @@ trait Validator {
     public function validate(Request $request, array $rules) {
         if ($request->method() == "POST") {
             if ($request->input('_token')) {
-                $tc = new TokenContract('_token',$request->input('token'));
+                $tc = new TokenContract('_token',$request->input('_token'));
                 $tc->isValid();
             }
         }
