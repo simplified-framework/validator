@@ -17,19 +17,19 @@ class DateContract extends Contract{
             return false;
 
         $params = $this->parameters();
-        //if (is_null($params) || strlen($params) == 0)
-        //    throw new DateContractException("Invalid rule parameter: params must not be null or empty");
+        if (is_null($params) || strlen($params) == 0)
+            throw new DateContractException("Invalid rule parameter: params must not be null or empty");
 
         if (strpos($params, "before") === 0) {
             $colon_pos = strpos($params, ":");
-            if ($colon_pos != 6)
-                return false;
+            if ($colon_pos != 6) {
+                throw new DateContractException("Invalid rule parameter: invalid date");
+            }
 
             $datestr = substr($params, $colon_pos+1);
             $datetime = strtotime($datestr);
             if ($datetime === false) {
-                $this->error = "Invalid date parameter";
-                // throw new DateContractException("Invalid rule parameter: invalid date");
+                throw new DateContractException("Invalid rule parameter: invalid date");
             }
             $rightdate = date("Y-m-d 00:00:00", $datetime);
             $leftdate  = date("Y-m-d 00:00:00", $datevalue);
@@ -39,14 +39,14 @@ class DateContract extends Contract{
         else
             if (strpos($params, "after") === 0) {
                 $colon_pos = strpos($params, ":");
-                if ($colon_pos != 5)
-                    return false;
+                if ($colon_pos != 5) {
+                    throw new DateContractException("Invalid rule parameter: invalid date");
+                }
 
                 $datestr = substr($params, $colon_pos+1);
                 $datetime = strtotime($datestr);
                 if ($datetime === false) {
-                    $this->error = "Invalid date parameter";
-                    // throw new DateContractException("Invalid rule parameter: invalid date");
+                    throw new DateContractException("Invalid rule parameter: invalid date");
                 }
                 $rightdate = date("Y-m-d 00:00:00", $datetime);
                 $leftdate  = date("Y-m-d 00:00:00", $datevalue);
@@ -56,8 +56,9 @@ class DateContract extends Contract{
             else
                 if (strpos($params, "equal") === 0) {
                     $colon_pos = strpos($params, ":");
-                    if ($colon_pos != 5)
-                        return false;
+                    if ($colon_pos != 5) {
+                        throw new DateContractException("Invalid rule parameter: invalid date");
+                    }
 
                     $datestr = substr($params, $colon_pos+1);
                     $datetime = strtotime($datestr);
@@ -73,8 +74,7 @@ class DateContract extends Contract{
                 else {
                     $colon_pos = strpos($params, ":");
                     if ($colon_pos !== false) {
-                        $this->error = "Invalid date parameter";
-                        // throw new DateContractException("Invalid rule parameter: date dont have a colon");
+                        throw new DateContractException("Invalid rule parameter: date dont have a colon");
                     }
 
                     $datestr = $params;
