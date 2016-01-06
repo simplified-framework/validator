@@ -38,6 +38,6 @@ abstract class Contract {
     }
 
     public function error() {
-        return "";
+        return $this->error;
     }
 }
