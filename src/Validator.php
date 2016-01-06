@@ -9,7 +9,6 @@
 namespace Simplified\Validator;
 
 use Simplified\Http\Request;
-use Simplified\Validator\Contracts;
 use Doctrine\Common\Inflector\Inflector;
 
 trait Validator {
