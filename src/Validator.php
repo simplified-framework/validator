@@ -10,10 +10,18 @@ namespace Simplified\Validator;
 
 use Simplified\Http\Request;
 use Doctrine\Common\Inflector\Inflector;
+use Simplified\Validator\Contracts\TokenContract;
 
 trait Validator {
     private $validationErrors = array();
     public function validate(Request $request, array $rules) {
+        if ($request->method() == "POST") {
+            if ($request->input('_token')) {
+                $tc = new TokenContract('_token',$request->input('token'));
+                $tc->isValid();
+            }
+        }
+
         $valid = true;
         foreach ($rules as $field => $rule) {
             if (is_null($rule) || !is_string($rule) || strlen($rule) == 0)
