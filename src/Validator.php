@@ -12,6 +12,7 @@ use Simplified\Http\Request;
 use Doctrine\Common\Inflector\Inflector;
 
 trait Validator {
+    private $validationErrors = array();
     public function validate(Request $request, array $rules) {
         $valid = true;
         foreach ($rules as $field => $rule) {
@@ -36,17 +37,23 @@ trait Validator {
             $args = explode(":", $parts[1]);
             $clazz = __NAMESPACE__. "\\Contracts\\" . Inflector::classify($args[0])."Contract";
             if (!class_exists($clazz))
-                throw new ValidationException("Invalid rule: invalid validation class '$clazz'");
+                throw new ValidationException("Invalid validation class '$clazz' in rule.");
 
 
-            $instance = new $clazz($value, isset($args[1]) ? $args[1]:array());
+            $instance = new $clazz($field, $value, isset($args[1]) ? $args[1]:array());
             if (!$instance instanceof Contract)
-                throw new ValidationException("Invalid rule: invalid validation class '$clazz'. Class must extend Simplified\\Validator\\Contract");
+                throw new ValidationException("'$clazz' must extend Simplified\\Validator\\Contract");
 
-            if (!$instance->isValid())
+            if (!$instance->isValid()) {
+                $this->validationErrors[] = $instance->error();
                 $valid = false;
+            }
         }
 
         return $valid;
+    }
+
+    public function validationErrors() {
+        return $this->validationErrors;
     }
 }

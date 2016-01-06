@@ -10,12 +10,19 @@ namespace Simplified\Validator;
 
 
 abstract class Contract {
+    protected $field;
     protected $value;
     protected $params;
+    protected $error;
 
-    public function __construct($value, $params = array()) {
+    public function __construct($field, $value, $params = array()) {
+        $this->field  = $field;
         $this->value  = $value;
         $this->params = $params;
+    }
+
+    public function field() {
+        return $this->field;
     }
 
     public function value() {
@@ -28,5 +35,9 @@ abstract class Contract {
 
     public function isValid() {
         return true;
+    }
+
+    public function error() {
+        return "";
     }
 }
