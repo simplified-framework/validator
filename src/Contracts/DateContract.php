@@ -34,6 +34,8 @@ class DateContract extends Contract{
             $rightdate = date("Y-m-d 00:00:00", $datetime);
             $leftdate  = date("Y-m-d 00:00:00", $datevalue);
             $before = strtotime($leftdate) < strtotime($rightdate);
+            if (!$before)
+                $this->error = "Date is not before required date";
             return $before;
         }
         else
@@ -51,6 +53,8 @@ class DateContract extends Contract{
                 $rightdate = date("Y-m-d 00:00:00", $datetime);
                 $leftdate  = date("Y-m-d 00:00:00", $datevalue);
                 $after = strtotime($leftdate) > strtotime($rightdate);
+                if (!$after)
+                    $this->error = "Date is not after required date";
                 return $after;
             }
             else
@@ -69,6 +73,8 @@ class DateContract extends Contract{
                     $rightdate = date("Y-m-d 00:00:00", $datetime);
                     $leftdate  = date("Y-m-d 00:00:00", $datevalue);
                     $equal = strtotime($leftdate) == strtotime($rightdate);
+                    if (!$equal)
+                        $this->error = "Date is not equal to required date";
                     return $equal;
                 }
                 else {
@@ -86,6 +92,8 @@ class DateContract extends Contract{
                     $rightdate = date("Y-m-d 00:00:00", $datetime);
                     $leftdate  = date("Y-m-d 00:00:00", $datevalue);
                     $equal = strtotime($leftdate) == strtotime($rightdate);
+                    if (!$equal)
+                        $this->error = "Date is not equal to required date";
                     return $equal;
                 }
     }
