@@ -15,7 +15,7 @@ use Simplified\Validator\Contracts\TokenContract;
 trait Validator {
     private $validationErrors = array();
     public function validate(Request $request, array $rules) {
-        if ($request->method() == "POST") {
+        if ($request->getMethod() == "POST") {
             if ($request->input('_token')) {
                 $tc = new TokenContract('_token',$request->input('_token'));
                 $tc->isValid();
