@@ -12,6 +12,14 @@ use Simplified\Validator\Contract;
 
 class ActiveUrlContract extends Contract {
     public function isValid() {
-        $services = array('A', 'MX', 'NS', 'SOA', 'PTR', 'CNAME', 'AAAA', 'A6', 'SRV', 'NAPTR', 'TXT', 'ANY');
+        // TODO check our params if we have a requested record type
+        $types = array('A', 'MX', 'NS', 'SOA', 'PTR', 'CNAME', 'AAAA', 'A6', 'SRV', 'NAPTR', 'TXT', 'ANY');
+        foreach ($types as $type) {
+            $ret = checkdnsrr($this->value(), $type);
+            if (!$ret)
+                return false;
+        }
+
+        return true;
     }
 }

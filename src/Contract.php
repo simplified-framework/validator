@@ -33,11 +33,9 @@ abstract class Contract {
         return $this->params;
     }
 
-    public function isValid() {
-        return true;
-    }
-
     public function error() {
         return $this->error;
     }
+
+    abstract public function isValid();
 }
