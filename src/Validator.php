@@ -42,13 +42,11 @@ trait Validator {
                 continue;
             }
 
-            $args = explode(":", $parts[1]);
-            $clazz = __NAMESPACE__. "\\Contracts\\" . Inflector::classify($args[0])."Contract";
+            $clazz = __NAMESPACE__. "\\Contracts\\" . Inflector::classify($parts[1])."Contract";
             if (!class_exists($clazz))
                 throw new ValidationException("Invalid validation class '$clazz' in rule.");
 
-
-            $instance = new $clazz($field, $value, isset($args[1]) ? $args[1]:array());
+            $instance = new $clazz($field, $value, isset($parts[2]) ? $parts[2]:null);
             if (!$instance instanceof Contract)
                 throw new ValidationException("'$clazz' must extend Simplified\\Validator\\Contract");
 

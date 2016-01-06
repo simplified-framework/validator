@@ -12,7 +12,10 @@ use Simplified\Validator\Contract;
 
 class DateContract extends Contract{
     public function isValid() {
-        $date = strtotime($this->value());
+        $timestamp = strtotime($this->value());
+        if ($timestamp === false)
+            return false;
+
         var_dump($this->parameters());
     }
 }
