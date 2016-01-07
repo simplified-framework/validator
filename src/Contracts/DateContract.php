@@ -17,8 +17,10 @@ class DateContract extends Contract{
             return false;
 
         $params = $this->parameters();
-        if (is_null($params) || strlen($params) == 0)
-            throw new DateContractException("Invalid rule parameter: params must not be null or empty");
+        if (is_null($params) || strlen($params) == 0) {
+            // field is date
+            return true;
+        }
 
         if (strpos($params, "before") === 0) {
             $colon_pos = strpos($params, ":");
