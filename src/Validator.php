@@ -12,6 +12,13 @@ use Simplified\Http\Request;
 use Doctrine\Common\Inflector\Inflector;
 use Simplified\Validator\Contracts\TokenContract;
 
+/*
+ * Validator::extend('alpha_spaces', function($attribute, $value)
+{
+    return preg_match('/^[\pL\s]+$/u', $value);
+});
+ */
+
 trait Validator {
     private $validationErrors = array();
     public function validate(Request $request, array $rules) {
@@ -39,6 +46,7 @@ trait Validator {
             $required = strtolower($parts[0]) == "required" ? true : false;
             if ($required && is_null($value)) {
                 $valid = false;
+                $this->validationErrors[] = "Field has no value";
                 continue;
             }
 

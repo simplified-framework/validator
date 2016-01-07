@@ -2,20 +2,20 @@
 /**
  * Created by PhpStorm.
  * User: Andreas
- * Date: 06.01.2016
- * Time: 18:32
+ * Date: 07.01.2016
+ * Time: 06:53
  */
 
 namespace Simplified\Validator\Contracts;
 
 use Simplified\Validator\Contract;
 
-class AlphaContract extends Contract{
+class ArrayContract extends Contract{
     public function isValid() {
-        if ( preg_match('/^[\pL]+$/u', $this->value()) )
+        if ( is_array($this->value()) )
             return true;
 
-        $this->error = "Not valid alphabetical characters";
+        $this->error = "Value is not a array";
         return false;
     }
 }
