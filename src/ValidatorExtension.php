@@ -148,3 +148,9 @@ Validator::extend('date', function($attribute, $value) {
     return ['valid' => ($valid !== false)];
 
 });
+
+Validator::extend('token', function($attribute, $value) {
+    $valid = isset($_SESSION['_token']) && $_SESSION['_token'] == $value;
+    return ['valid' => ($valid !== false)];
+
+});

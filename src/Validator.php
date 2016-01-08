@@ -57,23 +57,15 @@ trait Validator {
                 if (isset($ext_parts[1])) {
                     $ext_attr_parts = trim($ext_parts[1]);
                     $attrs_tmp = explode(",", $ext_attr_parts);
-
+                    foreach ($attrs_tmp as $attr) {
+                        $attrs[] = trim($attr);
+                    }
                 }
-            }
-            /*
-            $methodName = strtolower(array_shift($parts));
-            if (!isset(self::$extensions[$methodName])) {
-                throw new IllegalArgumentException("Validator extension '{$methodName}' isn't registered");
-            }
 
-            $extension = self::$extensions[$methodName];
-            $returnValue = call_user_func_array($extension, array($parts, $value));
-
-            if ($returnValue['valid'] === false) {
-                $this->validationErrors[$field] = $returnValue;
-                $valid = false;
+                $extension = self::$extensions[$ext];
+                $valid = call_user_func_array($extension, array($attrs, $value));
+                var_dump($valid);
             }
-            */
         }
 
         return $valid;
