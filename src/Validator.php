@@ -45,6 +45,21 @@ trait Validator {
             if (count($parts) == 0)
                 break;
 
+            foreach ($parts as $part) {
+                $ext_parts = explode(":", $part);
+                $ext = trim($ext_parts[0]);
+
+                if (!isset(self::$extensions[$ext])) {
+                    throw new ValidationException("Unknown extension '{$ext}''");
+                }
+
+                $attrs = array();
+                if (isset($ext_parts[1])) {
+                    $ext_attr_parts = trim($ext_parts[1]);
+                    $attrs_tmp = explode(",", $ext_attr_parts);
+
+                }
+            }
             /*
             $methodName = strtolower(array_shift($parts));
             if (!isset(self::$extensions[$methodName])) {
