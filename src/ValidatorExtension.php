@@ -39,11 +39,6 @@ Validator::extend('alpha', function($attribute, $value) {
     return ['valid' => $valid];
 });
 
-Validator::extend('alpha_spaces', function($attribute, $value) {
-    $valid = preg_match('/^[\pL\s]+$/u', $value);
-    return ['valid' => $valid];
-});
-
 Validator::extend('alpha_dash', function($attribute, $value) {
     $valid = preg_match('/^[\pL\-]+$/u', $value);
     return ['valid' => $valid];
@@ -51,6 +46,11 @@ Validator::extend('alpha_dash', function($attribute, $value) {
 
 Validator::extend('alpha_num', function($attribute, $value) {
     $valid = preg_match('/^[\pL0-9]+$/', $value);
+    return ['valid' => $valid];
+});
+
+Validator::extend('alpha_spaces', function($attribute, $value) {
+    $valid = preg_match('/^[\pL\s]+$/u', $value);
     return ['valid' => $valid];
 });
 
@@ -101,7 +101,7 @@ Validator::extend('boolean', function($attribute, $value) {
 });
 
 Validator::extend('date', function($attribute, $value) {
-    $valid = strotime($value);
+    $valid = strtotime($value);
     return ['valid' => ($valid !== false)];
 
 });
