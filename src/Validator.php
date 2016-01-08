@@ -8,26 +8,17 @@
 
 namespace Simplified\Validator;
 
+use Simplified\Core\IllegalArgumentException;
 use Simplified\Http\Request;
-use Doctrine\Common\Inflector\Inflector;
 use Simplified\Validator\Contracts\TokenContract;
 
-/*
- * Validator::extend('alpha_spaces', function($attribute, $value)
-{
-    return preg_match('/^[\pL\s]+$/u', $value);
-});
- */
-
 trait Validator {
+    private static $extensions = array();
     private $validationErrors = array();
+    private static $request;
+
     public function validate(Request $request, array $rules) {
-        if ($request->getMethod() == "POST") {
-            if ($request->input('_token')) {
-                $tc = new TokenContract('_token',$request->input('_token'));
-                $tc->isValid();
-            }
-        }
+        self::$request = $request;
 
         $valid = true;
         foreach ($rules as $field => $rule) {
@@ -40,28 +31,34 @@ trait Validator {
             // split validation rule into required / sometimes (no validation if not set or empty)
             // contract and contract parameters
             $parts = explode("|", $rule);
-            if (is_null($parts) || !is_array($parts) || count($parts) <2)
+            if (is_null($parts) || !is_array($parts))
                 throw new ValidationException("Invalid rule");
 
-            $required = strtolower($parts[0]) == "required" ? true : false;
+            $required = strtolower(array_shift($parts)) == "required" ? true : false;
             if ($required && is_null($value)) {
                 $valid = false;
-                $this->validationErrors[] = "Field has no value";
+                $this->validationErrors[] = "Field {$field} has no value";
                 continue;
             }
 
-            $clazz = __NAMESPACE__. "\\Contracts\\" . Inflector::classify($parts[1])."Contract";
-            if (!class_exists($clazz))
-                throw new ValidationException("Invalid validation class '$clazz' in rule.");
+            // rule has no attributes
+            if (count($parts) == 0)
+                break;
 
-            $instance = new $clazz($field, $value, isset($parts[2]) ? $parts[2]:null);
-            if (!$instance instanceof Contract)
-                throw new ValidationException("'$clazz' must extend Simplified\\Validator\\Contract");
+            /*
+            $methodName = strtolower(array_shift($parts));
+            if (!isset(self::$extensions[$methodName])) {
+                throw new IllegalArgumentException("Validator extension '{$methodName}' isn't registered");
+            }
 
-            if (!$instance->isValid()) {
-                $this->validationErrors[] = $instance->error();
+            $extension = self::$extensions[$methodName];
+            $returnValue = call_user_func_array($extension, array($parts, $value));
+
+            if ($returnValue['valid'] === false) {
+                $this->validationErrors[$field] = $returnValue;
                 $valid = false;
             }
+            */
         }
 
         return $valid;
@@ -69,5 +66,9 @@ trait Validator {
 
     public function validationErrors() {
         return $this->validationErrors;
+    }
+
+    public static function extend($name, \Closure $impl) {
+        self::$extensions[$name] = $impl;
     }
 }
