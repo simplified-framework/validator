@@ -16,6 +16,24 @@ Validator::extend('accepted', function($attributes, $value){
     return ['valid' => false];
 });
 
+Validator::extend('after', function($attribute, $value) {
+    if (count($attribute) != 1)
+        throw new ValidationException('Attribute must have a date value (after:date_value)');
+
+    $datetime_right = strtotime($attribute[0]);
+    if (!$datetime_right)
+        throw new ValidationException('Attribute must have a date value (after:date_value)');
+
+    $datetime_left = strtotime($value);
+    if (!$datetime_left)
+        return ['valid' => false];
+
+    $date_left = strtotime(date("Y-m-d 00:00:00", $datetime_left));
+    $date_right = strtotime(date("Y-m-d 00:00:00", $datetime_right));
+    $valid = $date_left > $date_right;
+    return ['valid' => $valid];
+});
+
 Validator::extend('alpha', function($attribute, $value) {
     $valid = preg_match('/^[\pL]+$/u', $value);
     return ['valid' => $valid];
@@ -32,12 +50,30 @@ Validator::extend('alpha_dash', function($attribute, $value) {
 });
 
 Validator::extend('alpha_num', function($attribute, $value) {
-    $valid = preg_match('/^[0-9]+$/', $value);
+    $valid = preg_match('/^[\pL0-9]+$/', $value);
     return ['valid' => $valid];
 });
 
 Validator::extend('array', function($attribute, $value) {
     $valid = is_array($value);
+    return ['valid' => $valid];
+});
+
+Validator::extend('before', function($attribute, $value) {
+    if (count($attribute) != 1)
+        throw new ValidationException('Attribute must have a date value (before:date_value)');
+
+    $datetime_right = strtotime($attribute[0]);
+    if (!$datetime_right)
+        throw new ValidationException('Attribute must have a date value (before:date_value)');
+
+    $datetime_left = strtotime($value);
+    if (!$datetime_left)
+        return ['valid' => false];
+
+    $date_left = strtotime(date("Y-m-d 00:00:00", $datetime_left));
+    $date_right = strtotime(date("Y-m-d 00:00:00", $datetime_right));
+    $valid = $date_left < $date_right;
     return ['valid' => $valid];
 });
 
@@ -64,6 +100,12 @@ Validator::extend('boolean', function($attribute, $value) {
     return ['valid' => false];
 });
 
+Validator::extend('date', function($attribute, $value) {
+    $valid = strotime($value);
+    return ['valid' => ($valid !== false)];
+
+});
+
 Validator::extend('different', function($attribute, $value) {
     if (!isset($attribute[0]))
         throw new ValidationException('Attribute must have field name (different:field_name)');
@@ -72,37 +114,10 @@ Validator::extend('different', function($attribute, $value) {
     return ['valid' => $other != $value];
 });
 
-Validator::extend('same', function($attribute, $value) {
-    if (!isset($attribute[0]))
-        throw new ValidationException('Attribute must have field name (different:field_name)');
-
-    $other = self::$request->input($attribute[0]);
-    return ['valid' => $other == $value];
-});
-
-Validator::extend('string', function($attribute, $value) {
-    $valid = is_string($value);
-    return ['valid' => $valid];
-
-});
-
 Validator::extend('integer', function($attribute, $value) {
     $valid = is_numeric($value);
     return ['valid' => $valid];
 
-});
-
-Validator::extend('min', function($attribute, $value) {
-    if (!isset($attribute[0]))
-        throw new ValidationException('Attribute must have min value (min:value)');
-
-    $valid = is_numeric($value);
-    if (!$valid)
-        return ['valid' => $valid];
-
-    $min = $attribute[0];
-    $valid = $value >= $min;
-    return ['valid' => $valid];
 });
 
 Validator::extend('max', function($attribute, $value) {
@@ -118,10 +133,31 @@ Validator::extend('max', function($attribute, $value) {
     return ['valid' => $valid];
 });
 
+Validator::extend('min', function($attribute, $value) {
+    if (!isset($attribute[0]))
+        throw new ValidationException('Attribute must have min value (min:value)');
+
+    $valid = is_numeric($value);
+    if (!$valid)
+        return ['valid' => $valid];
+
+    $min = $attribute[0];
+    $valid = $value >= $min;
+    return ['valid' => $valid];
+});
+
 Validator::extend('numeric', function($attribute, $value) {
     $valid = is_numeric($value);
     return ['valid' => $valid];
 
+});
+
+Validator::extend('same', function($attribute, $value) {
+    if (!isset($attribute[0]))
+        throw new ValidationException('Attribute must have field name (different:field_name)');
+
+    $other = self::$request->input($attribute[0]);
+    return ['valid' => $other == $value];
 });
 
 Validator::extend('size', function($attribute, $value) {
@@ -143,9 +179,9 @@ Validator::extend('size', function($attribute, $value) {
 
 });
 
-Validator::extend('date', function($attribute, $value) {
-    $valid = strotime($value);
-    return ['valid' => ($valid !== false)];
+Validator::extend('string', function($attribute, $value) {
+    $valid = is_string($value);
+    return ['valid' => $valid];
 
 });
 
