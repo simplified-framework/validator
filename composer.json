@@ -11,25 +11,10 @@
   ],
   "autoload": {
     "psr-4": {
-      "Simplified\\Validator\\":"src",
-      "Installer\\": "dist"
+      "Simplified\\Validator\\":"src"
     },
     "files": [
       "src/ValidatorExtension.php"
-    ]
-  },
-  "scripts": {
-    "post-install-cmd":[
-      "Installer\\ValidatorInstaller::postInstall"
-    ],
-    "post-update-cmd":[
-      "Installer\\ValidatorInstaller::postInstall"
-    ],
-    "post-package-install":[
-      "Installer\\ValidatorInstaller::postInstall"
-    ],
-    "post-package-update":[
-      "Installer\\ValidatorInstaller::postInstall"
     ]
   }
 }

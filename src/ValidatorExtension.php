@@ -71,7 +71,7 @@ Validator::extend('alpha_dash', function($attribute, $value) {
 
     $message = Lang::get('validator.value_not_alphabetic_with_dash');
     if (!$message)
-        $message = "Value is not alphabetic with dash";
+        $message = "Value is not alphabetic with dash(es)";
 
     $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
@@ -82,7 +82,7 @@ Validator::extend('alpha_num', function($attribute, $value) {
 
     $message = Lang::get('validator.value_not_alphanumeric');
     if (!$message)
-        $message = "Value is not alphanumeric";
+        $message = "Value is not alph anumeric";
 
     $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
@@ -93,7 +93,7 @@ Validator::extend('alpha_spaces', function($attribute, $value) {
 
     $message = Lang::get('validator.value_not_alpha_with_spaces');
     if (!$message)
-        $message = "Value is not alpha with spaces";
+        $message = "Value is not alpha with space(s)";
 
     $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
@@ -214,13 +214,17 @@ Validator::extend('max', function($attribute, $value) {
         throw new ValidationException('Attribute must have max value (max:value)');
 
     $valid = is_numeric($value);
-    if (!$valid)
-        return ['valid' => false, 'error' => 'Value is not numeric'];
+    if (!$valid) {
+        $message = Lang::get('validator.value_not_numeric');
+        if (!$message)
+            $message = "Value is not numeric";
+        return ['valid' => false, 'error' => $message];
+    }
 
     $max = $attribute[0];
     $valid = $value <= $max;
 
-    $message = Lang::get('validator.value_greater_than', array('max' => $max));
+    $message = Lang::get('validator.value_greater_than', array('value' => $max));
     if (!$message)
         $message = "Value is greater than {$max}";
 
@@ -233,13 +237,17 @@ Validator::extend('min', function($attribute, $value) {
         throw new ValidationException('Attribute must have min value (min:value)');
 
     $valid = is_numeric($value);
-    if (!$valid)
-        return ['valid' => false, 'error' => 'Value is not numeric'];
+    if (!$valid) {
+        $message = Lang::get('validator.value_not_numeric');
+        if (!$message)
+            $message = "Value is not numeric";
+        return ['valid' => false, 'error' => $message];
+    }
 
     $min = $attribute[0];
     $valid = $value >= $min;
 
-    $message = Lang::get('validator.value_less_than', array('min' => $min));
+    $message = Lang::get('validator.value_less_than', array('value' => $min));
     if (!$message)
         $message = "Value is less than {$min}";
 

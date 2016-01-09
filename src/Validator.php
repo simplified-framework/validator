@@ -17,6 +17,25 @@ trait Validator {
     private $validationErrors = array();
     private static $request;
 
+    public function __construct() {
+        $ns = strtolower(__NAMESPACE__);
+        $ns = str_replace("\\", DIRECTORY_SEPARATOR, $ns);
+        $target = I18N_PATH . "en" . DIRECTORY_SEPARATOR . "validator.php";
+        $source = VENDOR_PATH . $ns . DIRECTORY_SEPARATOR . "dist" . DIRECTORY_SEPARATOR . "validator.php";
+
+        if (!file_exists($target)) {
+            copy($source, $target);
+            return;
+        }
+
+        $t = file_get_contents($target);
+        $s = file_get_contents($source);
+        if (md5($t) != md5($s)) {
+            copy($source, $target);
+            return;
+        }
+    }
+
     public function validate(Request $request, array $rules) {
         self::$request = $request;
 
