@@ -25,6 +25,9 @@ trait Validator {
             if (is_null($rule) || !is_string($rule) || strlen($rule) == 0)
                 throw new ValidationException("Rule must be a string");
 
+            if (isset($this->validationErrors[$field]))
+                continue;
+
             // get field value
             $value = $request->input($field);
 
@@ -37,7 +40,7 @@ trait Validator {
             $required = strtolower(array_shift($parts)) == "required" ? true : false;
             if ($required && is_null($value)) {
                 $valid = false;
-                $this->validationErrors[] = "Field {$field} has no value";
+                $this->validationErrors[$field] = "Field {$field} has no value";
                 continue;
             }
 
@@ -46,11 +49,15 @@ trait Validator {
                 break;
 
             foreach ($parts as $part) {
+                if (!$valid)
+                    continue;
+
                 $ext_parts = explode(":", $part);
-                $ext = trim($ext_parts[0]);
+                $ext_orig = trim($ext_parts[0]);
+                $ext = strtolower($ext_orig);
 
                 if (!isset(self::$extensions[$ext])) {
-                    throw new ValidationException("Unknown extension '{$ext}''");
+                    throw new ValidationException("Unknown extension '{$ext_orig}''");
                 }
 
                 $attrs = array();
@@ -63,8 +70,15 @@ trait Validator {
                 }
 
                 $extension = self::$extensions[$ext];
-                $valid = call_user_func_array($extension, array($attrs, $value));
-                var_dump($valid);
+                $returnValue = call_user_func_array($extension, array($attrs, $value));
+                if (!isset($returnValue['valid']))
+                    throw new \InvalidArgumentException("Missing return value from extension {$ext_orig}");
+
+                if (!$returnValue['valid']) {
+                    $valid = false;
+                    $this->validationErrors[$field] = ($returnValue['error'] ? $returnValue['error'] : 'Unknown validation error');
+                    continue;
+                }
             }
         }
 
