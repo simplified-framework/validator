@@ -24,6 +24,12 @@
     ],
     "post-update-cmd":[
       "Installer\\ValidatorInstaller::postInstall"
+    ],
+    "post-package-install":[
+      "Installer\\ValidatorInstaller::postInstall"
+    ],
+    "post-package-update":[
+      "Installer\\ValidatorInstaller::postInstall"
     ]
   }
 }
