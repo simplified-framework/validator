@@ -11,7 +11,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "Simplified\\Validator\\":"src"
+      "Simplified\\Validator\\":"src",
+      "Installer\\": "dist"
     },
     "files": [
       "src/ValidatorExtension.php"
@@ -19,10 +20,10 @@
   },
   "scripts": {
     "post-install-cmd":[
-      "php -r \"copy('dist/validator.php', '/app/i18n/en/validator.php');\""
+      "Installer\\ValidatorInstaller::postInstall"
     ],
     "post-update-cmd":[
-      "php -r \"copy('dist/validator.php', '/app/i18n/en/validator.php');\""
+      "Installer\\ValidatorInstaller::postInstall"
     ]
   }
 }
