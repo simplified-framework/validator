@@ -76,7 +76,7 @@ trait Validator {
 
                 if (!$returnValue['valid']) {
                     $valid = false;
-                    $this->validationErrors[$field] = ($returnValue['error'] ? $returnValue['error'] : 'Unknown validation error');
+                    $this->validationErrors[$field] = (isset($returnValue['error']) ? $returnValue['error'] : 'Unknown validation error');
                     continue;
                 }
             }
