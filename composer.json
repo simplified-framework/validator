@@ -16,5 +16,13 @@
     "files": [
       "src/ValidatorExtension.php"
     ]
+  },
+  "scripts": {
+    "post-install-cmd":[
+      "php -r \"copy('dist/validator.php', '/app/i18n/en/validator.php');\""
+    ],
+    "post-update-cmd":[
+      "php -r \"copy('dist/validator.php', '/app/i18n/en/validator.php');\""
+    ]
   }
 }
