@@ -2,6 +2,7 @@
 
 use Simplified\Validator\Validator;
 use Simplified\Validator\ValidationException;
+use Simplified\Core\Lang;
 
 Validator::extend('accepted', function($attributes, $value){
     if ($value === true || $value === 1)
@@ -11,9 +12,20 @@ Validator::extend('accepted', function($attributes, $value){
         $lower = strtolower($value);
         if ($lower == "on" || $lower == "yes")
             return ['valid' => true];
+
+        $yes = Lang::get('validator.yes');
+        $no  = Lang::get('validator.no');
+        if ($yes && $no) {
+            if ($lower == $yes || $lower == $no) {
+                return ['valid' => true];
+            }
+        }
     }
 
-    return ['valid' => false, 'error' => 'Not accepted'];
+    $message = Lang::get('validator.not_accepted');
+    if (!$message)
+        $message = 'Not accepted';
+    return ['valid' => false, 'error' => $message];
 });
 
 Validator::extend('after', function($attribute, $value) {
@@ -25,43 +37,76 @@ Validator::extend('after', function($attribute, $value) {
         throw new ValidationException('Attribute must have a date value (after:date_value)');
 
     $datetime_left = strtotime($value);
-    if (!$datetime_left)
-        return ['valid' => false, 'error' => 'Invalid date'];
+    if (!$datetime_left) {
+        $message = Lang::get('validator.invalid_date');
+        if (!$message)
+            $message = 'Invalid date';
+        return ['valid' => false, 'error' => $message];
+    }
 
     $date_left = strtotime(date("Y-m-d 00:00:00", $datetime_left));
     $date_right = strtotime(date("Y-m-d 00:00:00", $datetime_right));
     $valid = $date_left > $date_right;
-    $error = $valid ? null : "Date is not after {$attribute[0]}";
+
+    $message = Lang::get('validator.date_not_after', array('after' => $attribute[0]));
+    if (!$message)
+        $message = "Date is not after {$attribute[0]}";
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('alpha', function($attribute, $value) {
     $valid = preg_match('/^[\pL]+$/u', $value);
-    $error = $valid ? null : "Value is not alphabetic";
+
+    $message = Lang::get('validator.value_not_alphabetic');
+    if (!$message)
+        $message = "Value is not alphabetic";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('alpha_dash', function($attribute, $value) {
     $valid = preg_match('/^[\pL\-]+$/u', $value);
-    $error = $valid ? null : "Value is not alphabetic with dash";
+
+    $message = Lang::get('validator.value_not_alphabetic_with_dash');
+    if (!$message)
+        $message = "Value is not alphabetic with dash";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('alpha_num', function($attribute, $value) {
     $valid = preg_match('/^[\pL0-9]+$/', $value);
-    $error = $valid ? null : "Value is not alpha-numeric";
+
+    $message = Lang::get('validator.value_not_alphanumeric');
+    if (!$message)
+        $message = "Value is not alphanumeric";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('alpha_spaces', function($attribute, $value) {
     $valid = preg_match('/^[\pL\s]+$/u', $value);
-    $error = $valid ? null : "Value is not alpha with spaces";
+
+    $message = Lang::get('validator.value_not_alpha_with_spaces');
+    if (!$message)
+        $message = "Value is not alpha with spaces";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('array', function($attribute, $value) {
     $valid = is_array($value);
-    $error = $valid ? null : "Value is not a array";
+
+    $message = Lang::get('validator.value_not_array');
+    if (!$message)
+        $message = "Value is not a array";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
@@ -74,13 +119,22 @@ Validator::extend('before', function($attribute, $value) {
         throw new ValidationException('Attribute must have a date value (before:date_value)');
 
     $datetime_left = strtotime($value);
-    if (!$datetime_left)
-        return ['valid' => false, 'error' => 'Invalid date'];
+    if (!$datetime_left) {
+        $message = Lang::get('validator.invalid_date');
+        if (!$message)
+            $message = "Invalid date";
+        return ['valid' => false, 'error' => $message];
+    }
 
     $date_left = strtotime(date("Y-m-d 00:00:00", $datetime_left));
     $date_right = strtotime(date("Y-m-d 00:00:00", $datetime_right));
     $valid = $date_left < $date_right;
-    $error = $valid ? null : "Date is not before {$attribute[0]}";
+
+    $message = Lang::get('validator.date_not_before', array('before' => $attribute[0]));
+    if (!$message)
+        $message = "Date is not before {$attribute[0]}";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
@@ -91,7 +145,12 @@ Validator::extend('between', function($attribute, $value){
     $min = $attribute[0];
     $max = $attribute[1];
     $valid = is_numeric($value) && $value > $min && $value < $max;
-    $error = $valid ? null : "Value is not between [$min} and {$max}";
+
+    $message = Lang::get('validator.value_not_between', array('min' => $min, 'max' => $max));
+    if (!$message)
+        $message = "Value is not between [$min} and {$max}";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
@@ -105,13 +164,21 @@ Validator::extend('boolean', function($attribute, $value) {
     if ($value == 'yes' || $value == 'no')
         return ['valid' => true];
 
-    $error = "Value is not boolean";
-    return ['valid' => false, 'error' => $error];
+    $message = Lang::get('validator.value_not_boolean');
+    if (!$message)
+        $message = "Value is not a boolean";
+
+    return ['valid' => false, 'error' => $message];
 });
 
 Validator::extend('date', function($attribute, $value) {
     $valid = strtotime($value);
-    $error = $valid ? null : "Value is not a date";
+
+    $message = Lang::get('validator.value_not_date');
+    if (!$message)
+        $message = "Value is not a date";
+
+    $error = $valid ? null : $message;
     return ['valid' => ($valid !== false), 'error' => $error];
 
 });
@@ -122,13 +189,23 @@ Validator::extend('different', function($attribute, $value) {
 
     $other = self::$request->input($attribute[0]);
     $valid = $other != $value;
-    $error = $valid ? null : "Value is not different";
+
+    $message = Lang::get('validator.value_not_different');
+    if (!$message)
+        $message = "Value is not different";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('integer', function($attribute, $value) {
     $valid = is_numeric($value);
-    $error = $valid ? null : "Value is not a integer";
+
+    $message = Lang::get('validator.value_not_integer');
+    if (!$message)
+        $message = "Value is not a integer";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
@@ -142,7 +219,12 @@ Validator::extend('max', function($attribute, $value) {
 
     $max = $attribute[0];
     $valid = $value <= $max;
-    $error = $valid ? null : "Value is greater than {$max}";
+
+    $message = Lang::get('validator.value_greater_than', array('max' => $max));
+    if (!$message)
+        $message = "Value is greater than {$max}";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
@@ -156,13 +238,23 @@ Validator::extend('min', function($attribute, $value) {
 
     $min = $attribute[0];
     $valid = $value >= $min;
-    $error = $valid ? null : "Value is less than {$min}";
+
+    $message = Lang::get('validator.value_less_than', array('min' => $min));
+    if (!$message)
+        $message = "Value is less than {$min}";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('numeric', function($attribute, $value) {
     $valid = is_numeric($value);
-    $error = $valid ? null : "Value is not numeric";
+
+    $message = Lang::get('validator.value_not_numeric');
+    if (!$message)
+        $message = "Value is not numeric";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 
 });
@@ -173,7 +265,12 @@ Validator::extend('same', function($attribute, $value) {
 
     $other = self::$request->input($attribute[0]);
     $valid = $other == $value;
-    $error = $valid ? null : "Value is not equal to {$other}";
+
+    $message = Lang::get('validator.value_not_equal', array('other' => $other));
+    if (!$message)
+        $message = "Value is not equal to {$other}";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
@@ -184,28 +281,50 @@ Validator::extend('size', function($attribute, $value) {
     $size = $attribute[0];
     if (is_string($value)) {
         $valid = strlen($value) == $size;
-        $error = $valid ? null : "Value is not {$size}";
+
+        $message = Lang::get('validator.value_not', array('size' => $size));
+        if (!$message)
+            $message = "Value is not {$size}";
+
+        $error = $valid ? null : $message;
         return ['valid' => $valid, 'error' => $error];
     }
 
     if (is_numeric($value)) {
         $valid = $value == $size;
-        $error = $valid ? null : "Value is not {$size}";
+        $message = Lang::get('validator.value_not', array('size' => $size));
+        if (!$message)
+            $message = "Value is not {$size}";
+
+        $error = $valid ? null : $message;
         return ['valid' => $valid, 'error' => $error];
     }
 
-    $error = "Value is not a size";
-    return ['valid' => false, 'error' => $error];
+    $message = Lang::get('validator.value_not_size');
+    if (!$message)
+        $message = "Value is not a size";
+
+    return ['valid' => false, 'error' => $message];
 });
 
 Validator::extend('string', function($attribute, $value) {
     $valid = is_string($value);
-    $error = $valid ? null : "Value is not a string";
+
+    $message = Lang::get('validator.value_not_string');
+    if (!$message)
+        $message = "Value is not a string";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
 
 Validator::extend('token', function($attribute, $value) {
     $valid = isset($_SESSION['_token']) && $_SESSION['_token'] == $value;
-    $error = $valid ? null : "Value is invalid";
+
+    $message = Lang::get('validator.invalid_token');
+    if (!$message)
+        $message = "Token is invalid";
+
+    $error = $valid ? null : $message;
     return ['valid' => $valid, 'error' => $error];
 });
