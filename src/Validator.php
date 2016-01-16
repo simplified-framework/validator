@@ -45,7 +45,7 @@ trait Validator {
                 throw new ValidationException("Rule must be a string");
 
             if (isset($this->validationErrors[$field]))
-                continue;
+                break;
 
             // get field value
             $value = $request->input($field);
@@ -57,7 +57,7 @@ trait Validator {
                 throw new ValidationException("Invalid rule");
 
             $required = strtolower(array_shift($parts)) == "required" ? true : false;
-            if ($required && is_null($value)) {
+            if (($required && is_null($value)) || ($required && empty($value))) {
                 $valid = false;
                 $this->validationErrors[$field] = "Field {$field} has no value";
                 continue;
